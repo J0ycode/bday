@@ -9,7 +9,7 @@
   <meta name="description" content="A special birthday surprise made with love." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Fredoka+One&family=Satisfy&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&family=Fredoka+One&family=Satisfy&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
 
   <style>
     /* ═══════════════════════════════════════════
@@ -588,154 +588,492 @@
     .letter-next.show { opacity: 1; }
 
     /* ═══════════════════════════════════════════
-       SCREEN 7 — POLAROID WALL
+       SCREEN 7 — PHOTO BOUQUET (redesigned)
     ════════════════════════════════════════════ */
     #screen-7 {
-      background: var(--warm-pink);
-      border-radius: 28px;
+      background: transparent;
+      border-radius: 0;
     }
-
     #screen-7 .card {
-      background: var(--warm-pink);
+      background: transparent;
       box-shadow: none;
+      padding: 0;
+      overflow: visible;
     }
-
     #screen-7 .card::before { display: none; }
 
-    /* String */
-    .polaroid-string {
-      width: 100%;
-      height: 3px;
-      background: linear-gradient(90deg, transparent, #a04060, #c0506a, #a04060, transparent);
-      border-radius: 2px;
-      margin-bottom: 0;
+    /* ══════════════════════════════════════════════════
+       SCREEN 7 — PHOTO BOUQUET (flower bouquet design)
+    ════════════════════════════════════════════════════ */
+
+    /* ── Bouquet Stage ── */
+    .bouquet-stage {
       position: relative;
+      width: 100%;
+      min-height: 100dvh;
+      background: linear-gradient(160deg, #fff5f8 0%, #fce8ef 40%, #f8dce7 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0 0 48px;
+      overflow: hidden;
     }
 
-    /* Clothespin */
-    .clothespin {
-      width: 12px;
-      height: 24px;
-      background: #d4956a;
-      border-radius: 3px 3px 6px 6px;
-      position: absolute;
-      top: -10px;
-      transform: translateX(-50%);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.18);
-    }
-
-    .clothespin::after {
+    /* Soft ambient glow behind bouquet */
+    .bouquet-stage::before {
       content: '';
       position: absolute;
-      top: 6px; left: 50%;
+      top: 25%;
+      left: 50%;
       transform: translateX(-50%);
-      width: 4px;
-      height: 14px;
-      background: #bf7e52;
-      border-radius: 2px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(192,57,90,0.10) 0%, transparent 68%);
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .polaroids-row {
+    /* Scattered petal decorations */
+    .bouquet-stage::after {
+      content: '🌸  🌺  🌷  🌸  🌺';
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.3rem;
+      letter-spacing: 14px;
+      opacity: 0.35;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    /* Top title bar */
+    .bouquet-title-bar {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 32px 20px 0;
+      pointer-events: none;
+    }
+    .bouquet-title-bar h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.4rem, 5vw, 2.4rem);
+      color: var(--rose);
+      text-shadow: 0 2px 14px rgba(192,57,90,0.20);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .bouquet-title-bar p {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      color: var(--text-mid);
+      font-size: clamp(0.85rem, 2.5vw, 1.05rem);
+    }
+
+    /* ══════════════════════════════
+       BOUQUET FLOWER ARRANGEMENT
+    ══════════════════════════════ */
+
+    /* Outer wrapper: photo arc + stem together */
+    .bouquet-wrapper {
+      position: relative;
       display: flex;
-      justify-content: center;
-      gap: 18px;
-      margin-top: -2px;
-      flex-wrap: wrap;
-      padding: 18px 0 24px;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      z-index: 2;
+      margin-top: 16px;
+      /* Reserve room for the fanned photos + stem */
+      padding-bottom: 20px;
     }
 
-    .polaroid {
-      background: white;
-      padding: 12px 12px 34px;
-      box-shadow: 0 10px 34px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.12);
-      animation: polaSway 4s ease-in-out infinite;
+    /* The arc area where photos fan out */
+    .bouquet-arc {
+      position: relative;
+      /* Size adapts to viewport */
+      width: min(400px, 92vw);
+      height: min(340px, 78vw);
+      margin: 0 auto;
+    }
+
+    /* Each photo petal */
+    .petal-card {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      /* Pivot from bottom-center (stem base) */
+      transform-origin: bottom center;
+      cursor: pointer;
+      transition: transform 0.4s cubic-bezier(0.34,1.38,0.64,1),
+                  box-shadow 0.3s ease,
+                  filter 0.3s ease;
+      /* Stagger animation via JS */
+      opacity: 0;
+    }
+
+    .petal-card.revealed {
+      animation: petalBloom 0.7s cubic-bezier(0.34,1.45,0.64,1) both;
+    }
+
+    @keyframes petalBloom {
+      0%   { opacity: 0; transform: translateX(-50%) rotate(var(--angle)) translateY(60px) scale(0.6); }
+      60%  { opacity: 1; transform: translateX(-50%) rotate(var(--angle)) translateY(-8px) scale(1.04); }
+      100% { opacity: 1; transform: translateX(-50%) rotate(var(--angle)) translateY(0) scale(1); }
+    }
+
+    /* The polaroid frame */
+    .petal-photo {
+      width: clamp(80px, 18vw, 120px);
+      background: #fff;
+      border-radius: 6px;
+      padding: 6px 6px 24px;
+      box-shadow:
+        0 6px 24px rgba(192,57,90,0.18),
+        0 2px 8px rgba(0,0,0,0.12);
+      transition: inherit;
       position: relative;
     }
 
-    .polaroid:nth-child(1) { transform: rotate(-2.5deg); animation-delay: 0s; }
-    .polaroid:nth-child(2) { transform: rotate(1.2deg); animation-delay: 0.5s; }
-    .polaroid:nth-child(3) { transform: rotate(-1.8deg); animation-delay: 1s; }
-
-    @keyframes polaSway {
-      0%,100% { transform: rotate(var(--r, -2.5deg)) translateY(0); }
-      50%      { transform: rotate(var(--r, -2.5deg)) translateY(-5px); }
+    .petal-card:hover .petal-photo {
+      box-shadow:
+        0 16px 40px rgba(192,57,90,0.30),
+        0 4px 16px rgba(0,0,0,0.18),
+        0 0 0 2px var(--blush);
+      filter: brightness(1.04);
     }
 
-    .polaroid:nth-child(1) { --r: -2.5deg; }
-    .polaroid:nth-child(2) { --r: 1.2deg; }
-    .polaroid:nth-child(3) { --r: -1.8deg; }
-
-    /* CUSTOMIZE: Replace these divs with <img> tags for real photos */
-    .photo-slot {
-      width: 155px;
-      height: 145px;
-      background: linear-gradient(135deg, #f0e0e8, #e8d0d8);
+    .petal-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      overflow: hidden;
+      border-radius: 3px;
+      background: linear-gradient(135deg, var(--blush), #f5d0dc);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: var(--font-script);
-      font-size: 0.82rem;
-      color: #a07080;
-      text-align: center;
-      line-height: 1.4;
-      border: 1px dashed #c0a0a8;
-      padding: 10px;
+      font-size: 2rem;
     }
-
-    .photo-slot img {
+    .petal-img img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
     }
 
-    .polaroid-caption {
-      text-align: center;
-      font-family: var(--font-script);
-      font-size: 0.88rem;
-      color: #666;
-      margin-top: 8px;
+    .petal-caption {
       position: absolute;
-      bottom: 8px;
-      left: 0; right: 0;
+      bottom: 5px;
+      left: 4px; right: 4px;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(0.48rem, 1.2vw, 0.62rem);
+      color: var(--text-mid);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
     }
 
-    /* LOVE YOU bubble letters */
-    .love-bubble {
-      font-family: var(--font-bold);
-      font-size: clamp(2.4rem, 8vw, 4.2rem);
-      color: white;
-      text-shadow:
-        -3px -3px 0 #c0395a,
-         3px -3px 0 #c0395a,
-        -3px  3px 0 #c0395a,
-         3px  3px 0 #c0395a,
-         0    6px 0 rgba(0,0,0,0.15);
-      letter-spacing: 4px;
-      margin-top: 12px;
+    /* Hover lift: JS overrides the rotate+translateX but adds translateY */
+    .petal-card:hover {
+      z-index: 50 !important;
+    }
+
+    /* ── Stem ── */
+    .bouquet-stem {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: -6px;
+    }
+
+    /* Gold ribbon bow */
+    .ribbon-bow {
+      position: relative;
+      width: 72px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    .ribbon-bow::before {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-32deg);
+      width: 32px; height: 24px;
+      background: linear-gradient(135deg, #c0395a, #e86080, #c0395a);
+      border-radius: 50% 50% 50% 0 / 60% 60% 40% 40%;
+      box-shadow: 0 2px 8px rgba(192,57,90,0.30);
+    }
+    .ribbon-bow::after {
+      content: '';
+      position: absolute;
+      right: 2px;
+      top: 50%;
+      transform: translateY(-50%) rotate(32deg);
+      width: 32px; height: 24px;
+      background: linear-gradient(135deg, #c0395a, #e86080, #c0395a);
+      border-radius: 50% 50% 0 50% / 60% 60% 40% 40%;
+      box-shadow: 0 2px 8px rgba(192,57,90,0.30);
+    }
+    .ribbon-knot {
+      position: relative;
+      z-index: 2;
+      width: 16px; height: 16px;
+      background: linear-gradient(135deg, #e8607a, #ff8fa3, #c0395a);
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(192,57,90,0.40);
+    }
+    .ribbon-tails {
+      display: flex;
       gap: 12px;
+      margin-top: -2px;
+    }
+    .ribbon-tail {
+      width: 9px; height: 30px;
+      background: linear-gradient(to bottom, #e86080, #c0395a);
+      border-radius: 0 0 6px 6px;
+      position: relative;
+    }
+    .ribbon-tail::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 4.5px solid transparent;
+      border-right: 4.5px solid transparent;
+      border-bottom: 7px solid #fce8ef;
+    }
+
+    /* Green stem stick */
+    .bouquet-wrap-stem {
+      width: 14px;
+      height: 70px;
+      background: linear-gradient(to bottom, #5a8a4a, #3a6a30, #2a5222);
+      border-radius: 0 0 12px 12px;
+      margin: 0 auto;
+      box-shadow: 2px 0 6px rgba(60,100,40,0.20);
+      position: relative;
+    }
+    /* Little leaf detail on stem */
+    .bouquet-wrap-stem::before {
+      content: '🍃';
+      position: absolute;
+      left: 12px; top: 18px;
+      font-size: 1rem;
+      transform: rotate(-30deg);
+      opacity: 0.9;
+    }
+    .bouquet-wrap-stem::after {
+      content: '🍃';
+      position: absolute;
+      right: 12px; top: 36px;
+      font-size: 0.9rem;
+      transform: rotate(30deg) scaleX(-1);
+      opacity: 0.85;
+    }
+
+    /* ── Sparkle Particles ── */
+    .bouquet-sparkles {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 5;
+    }
+    .bsparkle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--rose);
+      animation: bSparkleAnim var(--dur, 2s) ease-in-out infinite;
+      opacity: 0;
+    }
+    @keyframes bSparkleAnim {
+      0%   { opacity: 0; transform: scale(0) translate(0,0); }
+      30%  { opacity: 0.85; }
+      70%  { opacity: 0.45; }
+      100% { opacity: 0; transform: scale(0.3) translate(var(--tx,0), var(--ty,0)); }
+    }
+
+    /* ── Bouquet Action Buttons ── */
+    .bouquet-actions {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px 20px 0;
+    }
+    .bouquet-btn {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      padding: 10px 22px;
+      border-radius: 50px;
+      border: 1.5px solid var(--rose);
+      background: transparent;
+      color: var(--rose);
+      cursor: pointer;
+      transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+      letter-spacing: 0.4px;
+    }
+    .bouquet-btn:hover {
+      background: rgba(192,57,90,0.08);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(192,57,90,0.18);
+    }
+    .bouquet-btn:active { transform: translateY(0) scale(0.97); }
+    .bouquet-btn.primary {
+      background: linear-gradient(135deg, var(--rose), #e86080);
+      color: #fff;
+      border-color: transparent;
+      font-weight: 700;
+      box-shadow: 0 4px 16px rgba(192,57,90,0.28);
+    }
+    .bouquet-btn.primary:hover {
+      background: linear-gradient(135deg, #d4486a, #f07090);
+      box-shadow: 0 8px 28px rgba(192,57,90,0.40);
+    }
+
+    /* Next row */
+    .bouquet-next-row {
+      position: relative;
+      z-index: 10;
+      text-align: right;
+      padding: 16px 24px 0;
+    }
+    .bouquet-next-row .btn-text { color: var(--rose); }
+
+    /* ── Lightbox Modal ── */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(8px);
+      animation: lbFadeIn 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .lightbox-overlay.open { display: flex; }
+    @keyframes lbFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .lightbox-inner {
+      background: var(--cream);
+      border: 1.5px solid var(--blush);
+      border-radius: 20px;
+      padding: 24px;
+      max-width: min(480px, 92vw);
+      width: 100%;
+      box-shadow: 0 24px 80px rgba(192,57,90,0.20), 0 4px 20px rgba(0,0,0,0.14);
+      animation: lbSlideUp 0.35s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+    }
+    @keyframes lbSlideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+    .lightbox-photo-wrap {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      background: var(--cream-dark);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      margin-bottom: 16px;
+      border: 1.5px solid var(--blush);
+    }
+    .lightbox-photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .lightbox-caption-input {
+      width: 100%;
+      background: var(--cream-dark);
+      border: 1.5px solid var(--blush);
+      border-radius: 10px;
+      color: var(--text-dark);
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.25s;
+      margin-bottom: 16px;
+    }
+    .lightbox-caption-input:focus { border-color: var(--rose); }
+    .lightbox-actions {
+      display: flex;
+      gap: 10px;
       flex-wrap: wrap;
     }
-
-    .love-sep { font-size: 24px; }
-
-    .love-sub {
-      font-family: var(--font-script);
-      font-size: clamp(1rem, 3vw, 1.3rem);
-      color: rgba(255,255,255,0.9);
-      font-weight: 600;
-      margin-top: 8px;
+    .lb-btn {
+      flex: 1;
+      min-width: 100px;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-
-    #screen-7 .next-row {
-      text-align: right;
-      margin-top: 24px;
+    .lb-btn:hover { transform: translateY(-2px); }
+    .lb-btn-upload {
+      background: rgba(192,57,90,0.08);
+      color: var(--rose);
+      border: 1.5px solid var(--blush);
     }
+    .lb-btn-save {
+      background: linear-gradient(135deg, var(--rose), #e86080);
+      color: #fff;
+      font-weight: 700;
+    }
+    .lb-btn-close {
+      background: var(--cream-dark);
+      color: var(--text-mid);
+      border: 1px solid var(--blush);
+      min-width: unset;
+      flex: none;
+      width: 42px;
+      padding: 10px;
+    }
+    /* hidden file input */
+    #bouquet-file-input { display: none; }
 
-    #screen-7 .btn-text { color: white; }
+    /* ── Mobile: smaller photos ── */
+    @media (max-width: 480px) {
+      .bouquet-arc {
+        width: min(340px, 94vw);
+        height: min(280px, 72vw);
+      }
+      .petal-photo { width: clamp(64px, 15vw, 90px); }
+      .bouquet-title-bar h2 { font-size: clamp(1.2rem, 5vw, 1.8rem); }
+    }
+    @media (max-width: 360px) {
+      .bouquet-arc {
+        width: min(300px, 96vw);
+        height: min(240px, 68vw);
+      }
+      .petal-photo { width: clamp(56px, 14vw, 76px); }
+    }
 
     /* ═══════════════════════════════════════════
        SCREEN 8 — VIRTUAL HUG / FINAL
@@ -1160,43 +1498,69 @@
     </div>
 
     <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         SCREEN 7 — POLAROID MEMORY WALL
+         SCREEN 7 — PHOTO BOUQUET
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
     <div id="screen-7" class="screen">
       <div class="card">
-        <h2 class="title-bold" style="color: white; margin-bottom: 20px; font-size: clamp(1.8rem, 5vw, 2.6rem);">
-          Our Memories 📸
-        </h2>
+        <div class="bouquet-stage">
 
-        <!-- String with clothespins -->
-        <div class="polaroid-string" id="pola-string">
-          <div class="clothespin" style="left: 20%;"></div>
-          <div class="clothespin" style="left: 50%;"></div>
-          <div class="clothespin" style="left: 80%;"></div>
-        </div>
+          <!-- Title -->
+          <div class="bouquet-title-bar">
+            <h2>Our Memories 💐</h2>
+            <p>a bouquet of moments, just for you</p>
+          </div>
 
-        <!-- Polaroid photos -->
-        <div class="polaroids-row">
+          <!-- Bouquet: arc of photos + sparkles -->
+          <div class="bouquet-wrapper">
+            <div class="bouquet-arc" id="bouquet-arc">
+              <!-- Petal cards injected by JS -->
+              <div class="bouquet-sparkles" id="bouquet-sparkles"></div>
+            </div>
 
-          <!-- Polaroids are injected by applyConfig() from config.js -->
+            <!-- Ribbon Stem -->
+            <div class="bouquet-stem">
+              <div class="ribbon-bow">
+                <div class="ribbon-knot"></div>
+              </div>
+              <div class="ribbon-tails">
+                <div class="ribbon-tail"></div>
+                <div class="ribbon-tail" style="transform: rotate(4deg);"></div>
+              </div>
+              <div class="bouquet-wrap-stem"></div>
+            </div>
+          </div>
 
-        </div>
+          <!-- Action Buttons -->
+          <div class="bouquet-actions">
+            <button class="bouquet-btn" onclick="bouquetAddPhoto()">✦ Add Photo</button>
+            <button class="bouquet-btn primary" onclick="bouquetGift()">🎁 Gift it!</button>
+          </div>
 
-        <!-- Bubble Letter Love -->
-        <div class="love-bubble">
-          <span>I</span>
-          <span class="love-sep">❤️</span>
-          <span>LOVE</span>
-          <span class="love-sep">❤️</span>
-          <span>YOU</span>
-        </div>
-        <p class="love-sub">You don't know how much you mean to me.</p>
+          <!-- Next -->
+          <div class="bouquet-next-row">
+            <button class="btn-text" onclick="showScreen('screen-8'); startConfetti();">Next &nbsp;→</button>
+          </div>
 
-        <div class="next-row">
-          <button class="btn-text" onclick="showScreen('screen-8'); startConfetti();">Click here &nbsp;→</button>
+        </div><!-- end bouquet-stage -->
+      </div>
+    </div>
+
+
+    <!-- Lightbox -->
+    <div class="lightbox-overlay" id="lightbox-overlay">
+      <div class="lightbox-inner">
+        <div class="lightbox-photo-wrap" id="lb-photo-wrap">📷</div>
+        <input class="lightbox-caption-input" id="lb-caption-input"
+               type="text" placeholder="Write a caption…" maxlength="60" />
+        <div class="lightbox-actions">
+          <button class="lb-btn lb-btn-upload" onclick="lbTriggerUpload()">📂 Change Photo</button>
+          <button class="lb-btn lb-btn-save" onclick="lbSave()">Save ✓</button>
+          <button class="lb-btn lb-btn-close" onclick="lbClose()">✕</button>
         </div>
       </div>
     </div>
+    <!-- Hidden file input -->
+    <input type="file" id="bouquet-file-input" accept="image/*" />
 
     <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          SCREEN 8 — VIRTUAL HUG (FINAL)
@@ -1281,8 +1645,9 @@
       // Screen 6 — sign-off
       setText('s6-signoff', C.senderSignOff);
 
-      // Screen 7 — polaroids
-      buildPolaroids(C.polaroids);
+      // Screen 7 — bouquet (built on screen show, not here)
+      // Store polaroids for later
+      window._bouquetPhotos = (C.polaroids || []).map(p => ({ src: p.src || '', caption: p.caption || '' }));
 
       // Screen 8
       setText('s8-hug-text', C.screen8.hugText);
@@ -1300,35 +1665,246 @@
       if (el && val !== undefined) el.innerHTML = val;
     }
 
-    /* Build polaroid cards from config array */
-    function buildPolaroids(list) {
-      const row = document.querySelector('.polaroids-row');
-      if (!row) return;
-      row.innerHTML = '';
-      const rotations = ['-2.5deg', '1.2deg', '-1.8deg'];
-      const placeholders = ['🌸', '💕', '🌼'];
-      (list || []).forEach((item, i) => {
-        const rot = rotations[i % rotations.length];
-        const div = document.createElement('div');
-        div.className = 'polaroid';
-        div.style.setProperty('--r', rot);
+    /* ════════════════════════════════════════════════
+       PHOTO BOUQUET — Core Data & Constants
+    ══════════════════════════════════════════════════ */
 
-        let photoHTML;
-        if (item.src && item.src.trim() !== '') {
-          photoHTML = `<div class="photo-slot" style="padding:0;border:none;background:none;">
-            <img src="${item.src}" alt="Memory ${i + 1}" style="width:100%;height:100%;object-fit:cover;display:block;" />
-          </div>`;
+    // Fan angles for 5 petals spread from left to right
+    const PETAL_ANGLES = [-52, -26, 0, 26, 52];
+    // Slot emojis for empty petals
+    const SLOT_EMOJIS = ['🌸','💕','🌼','✨','🌺'];
+
+    // Flat array of petal data
+    let bouquetData = [];
+
+    // Currently active lightbox index
+    let lbActiveIndex = -1;
+
+    /* Build the flower bouquet: 5 petal photo cards fanning out */
+    function buildBouquet() {
+      const arc = document.getElementById('bouquet-arc');
+      if (!arc) return;
+
+      // Clear old petals
+      arc.querySelectorAll('.petal-card').forEach(c => c.remove());
+
+      // Populate bouquetData from config photos
+      const configPhotos = window._bouquetPhotos || [];
+      bouquetData = [];
+      for (let i = 0; i < PETAL_ANGLES.length; i++) {
+        const cfg = configPhotos[i] || {};
+        bouquetData.push({ src: cfg.src || '', caption: cfg.caption || '' });
+      }
+
+      PETAL_ANGLES.forEach((angle, i) => {
+        const card = document.createElement('div');
+        card.className = 'petal-card';
+        card.style.cssText = `
+          --angle: ${angle}deg;
+          transform: translateX(-50%) rotate(${angle}deg);
+          z-index: ${i === 2 ? 5 : (i < 2 ? i + 1 : PETAL_ANGLES.length - i)};
+        `;
+        card.dataset.petalIdx = i;
+
+        // Polaroid photo frame
+        const photo = document.createElement('div');
+        photo.className = 'petal-photo';
+
+        const imgWrap = document.createElement('div');
+        imgWrap.className = 'petal-img';
+
+        const d = bouquetData[i];
+        if (d.src) {
+          const img = document.createElement('img');
+          img.src = d.src;
+          img.alt = d.caption || 'Memory';
+          imgWrap.appendChild(img);
         } else {
-          const emoji = placeholders[i % placeholders.length];
-          photoHTML = `<div class="photo-slot">${emoji}<br />[ Add your<br />photo here ]</div>`;
+          imgWrap.textContent = SLOT_EMOJIS[i % SLOT_EMOJIS.length];
         }
 
-        div.innerHTML = `
-          ${photoHTML}
-          <span class="polaroid-caption">${item.caption || ''}</span>
-        `;
-        row.appendChild(div);
+        const cap = document.createElement('div');
+        cap.className = 'petal-caption';
+        cap.textContent = d.caption;
+
+        photo.appendChild(imgWrap);
+        photo.appendChild(cap);
+        card.appendChild(photo);
+
+        // Hover: lift petal up
+        card.addEventListener('mouseenter', () => {
+          card.style.transform = `translateX(-50%) rotate(${angle}deg) translateY(-22px) scale(1.06)`;
+          card.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)';
+          card.style.zIndex = 50;
+        });
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = `translateX(-50%) rotate(${angle}deg) translateY(0) scale(1)`;
+          card.style.transition = 'transform 0.35s cubic-bezier(0.4,0,0.2,1)';
+          card.style.zIndex = i === 2 ? 5 : (i < 2 ? i + 1 : PETAL_ANGLES.length - i);
+        });
+
+        // Tap / click → lightbox
+        card.addEventListener('click', (e) => {
+          e.stopPropagation();
+          lbOpen(i);
+        });
+
+        arc.insertBefore(card, document.getElementById('bouquet-sparkles'));
       });
+
+      // Staggered bloom animation
+      revealPetals();
+      initBouquetSparkles();
+    }
+
+    /* Staggered fan-out bloom animation */
+    function revealPetals() {
+      const petals = document.querySelectorAll('#bouquet-arc .petal-card');
+      // Bloom from center outward: order 2,1,3,0,4
+      const order = [2, 1, 3, 0, 4];
+      order.forEach((idx, step) => {
+        const petal = petals[idx];
+        if (!petal) return;
+        setTimeout(() => {
+          petal.classList.add('revealed');
+          const angle = PETAL_ANGLES[idx];
+          setTimeout(() => {
+            petal.style.opacity = '1';
+            petal.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+            petal.style.transition = 'transform 0.4s cubic-bezier(0.4,0,0.2,1)';
+          }, 720);
+        }, 80 + step * 130);
+      });
+    }
+
+    /* Sparkles at the bouquet center */
+    function initBouquetSparkles() {
+      const wrap = document.getElementById('bouquet-sparkles');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+      for (let i = 0; i < 16; i++) {
+        const s = document.createElement('div');
+        s.className = 'bsparkle';
+        const size = 2 + Math.random() * 4;
+        const cx = 42 + Math.random() * 16;
+        const cy = 60 + Math.random() * 16;
+        const tx = (Math.random() - 0.5) * 70;
+        const ty = (Math.random() - 0.5) * 70;
+        const dur = 1.5 + Math.random() * 2;
+        const delay = Math.random() * 3;
+        s.style.cssText = `
+          width:${size}px; height:${size}px;
+          left:${cx}%; top:${cy}%;
+          --tx:${tx}px; --ty:${ty}px;
+          --dur:${dur}s;
+          animation-delay:${delay}s;
+          opacity:0;
+        `;
+        wrap.appendChild(s);
+      }
+    }
+
+    /* ════════════════════════════════════════════════
+       LIGHTBOX
+    ══════════════════════════════════════════════════ */
+    function lbOpen(idx) {
+      lbActiveIndex = idx;
+      const overlay = document.getElementById('lightbox-overlay');
+      const photoWrap = document.getElementById('lb-photo-wrap');
+      const captionInput = document.getElementById('lb-caption-input');
+
+      const d = bouquetData[idx];
+      photoWrap.innerHTML = '';
+      if (d.src) {
+        const img = document.createElement('img');
+        img.src = d.src;
+        photoWrap.appendChild(img);
+      } else {
+        photoWrap.textContent = SLOT_EMOJIS[idx % SLOT_EMOJIS.length];
+      }
+
+      captionInput.value = d.caption || '';
+      overlay.classList.add('open');
+    }
+
+    function lbClose() {
+      document.getElementById('lightbox-overlay').classList.remove('open');
+      lbActiveIndex = -1;
+    }
+
+    function lbSave() {
+      if (lbActiveIndex < 0) return;
+      const caption = document.getElementById('lb-caption-input').value.trim();
+      bouquetData[lbActiveIndex].caption = caption;
+      // Update caption on the petal card
+      const card = document.querySelector(`[data-petal-idx="${lbActiveIndex}"]`);
+      if (card) card.querySelector('.petal-caption').textContent = caption;
+      lbClose();
+    }
+
+    function lbTriggerUpload() {
+      document.getElementById('bouquet-file-input').click();
+    }
+
+    // Handle file upload for lightbox active petal
+    document.getElementById('bouquet-file-input').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file || lbActiveIndex < 0) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const src = ev.target.result;
+        bouquetData[lbActiveIndex].src = src;
+
+        // Update lightbox
+        const photoWrap = document.getElementById('lb-photo-wrap');
+        photoWrap.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = src;
+        photoWrap.appendChild(img);
+
+        // Update petal thumbnail
+        const card = document.querySelector(`[data-petal-idx="${lbActiveIndex}"]`);
+        if (card) {
+          const wrap = card.querySelector('.petal-img');
+          wrap.innerHTML = '';
+          const thumb = document.createElement('img');
+          thumb.src = src;
+          wrap.appendChild(thumb);
+        }
+      };
+      reader.readAsDataURL(file);
+      this.value = '';
+    });
+
+    // Close lightbox on overlay click
+    document.getElementById('lightbox-overlay').addEventListener('click', function(e) {
+      if (e.target === this) lbClose();
+    });
+
+    /* ════════════════════════════════════════════════
+       BOUQUET ACTIONS
+    ══════════════════════════════════════════════════ */
+    /* Add Photo — opens file picker and assigns to next empty slot */
+    function bouquetAddPhoto() {
+      const emptyIdx = bouquetData.findIndex(d => !d.src);
+      lbActiveIndex = emptyIdx >= 0 ? emptyIdx : 0;
+      document.getElementById('bouquet-file-input').click();
+    }
+
+    /* Gift — bounce all petals then confetti */
+    function bouquetGift() {
+      document.querySelectorAll('#bouquet-arc .petal-card').forEach((card, i) => {
+        const angle = PETAL_ANGLES[i];
+        setTimeout(() => {
+          card.style.transform = `translateX(-50%) rotate(${angle}deg) translateY(-28px) scale(1.08)`;
+          card.style.transition = 'transform 0.35s cubic-bezier(0.34,1.56,0.64,1)';
+          setTimeout(() => {
+            card.style.transform = `translateX(-50%) rotate(${angle}deg) translateY(0) scale(1)`;
+          }, 450);
+        }, i * 70);
+      });
+      startConfetti();
+      setTimeout(stopConfetti, 4000);
     }
 
     /* Password is now always read from CONFIG */
@@ -1367,6 +1943,7 @@
 
         // Screen-specific init
         if (id === 'screen-6') initEnvelope();
+        if (id === 'screen-7') buildBouquet();
       }, currentScreen ? 250 : 0);
     }
 
