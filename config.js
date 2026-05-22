@@ -64,9 +64,11 @@ Happy Birthday, my love. 🌹`,
      caption → text below each polaroid
   ────────────────────────────────────────── */
   polaroids: [
-    { src: "",  caption: "that day 🌸"        },
-    { src: "",  caption: "us, always 💕"      },
-    { src: "",  caption: "my fav memory 🌼"   },
+    { src: "images/photo1.jpg", caption: "us, always 💕"         },
+    { src: "images/photo2.jpg", caption: "forever & ever 💍"     },
+    { src: "images/photo3.jpg", caption: "flower in my hair 🌺"  },
+    { src: "images/photo4.jpg", caption: "my favorite girl 🌸"   },
+    { src: "images/photo5.jpg", caption: "painted in love 🎨"    },
   ],
 
   /* ──────────────────────────────────────────
