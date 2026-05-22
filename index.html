@@ -692,9 +692,8 @@
     /* The arc area where photos fan out */
     .bouquet-arc {
       position: relative;
-      /* Size adapts to viewport */
-      width: min(400px, 92vw);
-      height: min(340px, 78vw);
+      width: min(560px, 96vw);
+      height: min(460px, 90vw);
       margin: 0 auto;
     }
 
@@ -725,7 +724,7 @@
 
     /* The polaroid frame */
     .petal-photo {
-      width: clamp(80px, 18vw, 120px);
+      width: clamp(120px, 24vw, 180px);
       background: #fff;
       border-radius: 6px;
       padding: 6px 6px 24px;
@@ -1055,24 +1054,51 @@
       width: 42px;
       padding: 10px;
     }
+    /* Caption read-only display in lightbox */
+    .lightbox-caption-view {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--text-mid);
+      text-align: center;
+      padding: 8px 0 16px;
+      min-height: 32px;
+    }
     /* hidden file input */
     #bouquet-file-input { display: none; }
+    /* Close button full width */
+    .lb-btn-close {
+      width: 100%;
+      flex: none;
+      background: linear-gradient(135deg, var(--rose), #e86080);
+      color: #fff;
+      font-weight: 700;
+      border: none;
+      padding: 12px;
+    }
 
-    /* ── Mobile: smaller photos ── */
-    @media (max-width: 480px) {
+    /* ── Mobile: responsive photos ── */
+    @media (max-width: 600px) {
       .bouquet-arc {
-        width: min(340px, 94vw);
-        height: min(280px, 72vw);
+        width: min(480px, 96vw);
+        height: min(380px, 86vw);
       }
-      .petal-photo { width: clamp(64px, 15vw, 90px); }
+      .petal-photo { width: clamp(90px, 20vw, 140px); }
+    }
+    @media (max-width: 420px) {
+      .bouquet-arc {
+        width: min(380px, 96vw);
+        height: min(310px, 82vw);
+      }
+      .petal-photo { width: clamp(72px, 18vw, 110px); }
       .bouquet-title-bar h2 { font-size: clamp(1.2rem, 5vw, 1.8rem); }
     }
     @media (max-width: 360px) {
       .bouquet-arc {
-        width: min(300px, 96vw);
-        height: min(240px, 68vw);
+        width: 96vw;
+        height: 78vw;
       }
-      .petal-photo { width: clamp(56px, 14vw, 76px); }
+      .petal-photo { width: clamp(60px, 16vw, 90px); }
     }
 
     /* ═══════════════════════════════════════════
@@ -1530,12 +1556,6 @@
             </div>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="bouquet-actions">
-            <button class="bouquet-btn" onclick="bouquetAddPhoto()">✦ Add Photo</button>
-            <button class="bouquet-btn primary" onclick="bouquetGift()">🎁 Gift it!</button>
-          </div>
-
           <!-- Next -->
           <div class="bouquet-next-row">
             <button class="btn-text" onclick="showScreen('screen-8'); startConfetti();">Next &nbsp;→</button>
@@ -1550,12 +1570,9 @@
     <div class="lightbox-overlay" id="lightbox-overlay">
       <div class="lightbox-inner">
         <div class="lightbox-photo-wrap" id="lb-photo-wrap">📷</div>
-        <input class="lightbox-caption-input" id="lb-caption-input"
-               type="text" placeholder="Write a caption…" maxlength="60" />
+        <div class="lightbox-caption-view" id="lb-caption-view"></div>
         <div class="lightbox-actions">
-          <button class="lb-btn lb-btn-upload" onclick="lbTriggerUpload()">📂 Change Photo</button>
-          <button class="lb-btn lb-btn-save" onclick="lbSave()">Save ✓</button>
-          <button class="lb-btn lb-btn-close" onclick="lbClose()">✕</button>
+          <button class="lb-btn lb-btn-close" onclick="lbClose()">✕ Close</button>
         </div>
       </div>
     </div>
@@ -1811,7 +1828,7 @@
       lbActiveIndex = idx;
       const overlay = document.getElementById('lightbox-overlay');
       const photoWrap = document.getElementById('lb-photo-wrap');
-      const captionInput = document.getElementById('lb-caption-input');
+      const captionView = document.getElementById('lb-caption-view');
 
       const d = bouquetData[idx];
       photoWrap.innerHTML = '';
@@ -1823,7 +1840,7 @@
         photoWrap.textContent = SLOT_EMOJIS[idx % SLOT_EMOJIS.length];
       }
 
-      captionInput.value = d.caption || '';
+      if (captionView) captionView.textContent = d.caption || '';
       overlay.classList.add('open');
     }
 
